@@ -235,19 +235,35 @@ document.addEventListener('DOMContentLoaded', function() {
             currentSlide = (currentSlide - 1 + slides.length) % slides.length;
             showSlide(currentSlide);
         }
-        
-        // Navigation button click handlers
+          // Navigation button click handlers
         prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             prevSlide();
             clearInterval(slideshowInterval);
-        });
+        }, true);
         
         nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             nextSlide();
             clearInterval(slideshowInterval);
-        });
+        }, true);
+
+        // Add touch event listeners specifically for buttons
+        prevBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            prevSlide();
+            clearInterval(slideshowInterval);
+        }, true);
+        
+        nextBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            nextSlide();
+            clearInterval(slideshowInterval);
+        }, true);
         
         // Initialize first slide
         showSlide(currentSlide);
