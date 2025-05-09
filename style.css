@@ -211,6 +211,7 @@ section {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 50px;
+    /* Removed invalid property 'behaviour' */
     height: 50px;
     border: 3px solid rgba(0, 0, 0, 0.3);
     border-radius: 50%;
@@ -430,7 +431,7 @@ footer {
 }
 
 .slide.error::before {
-    content: '\f1c5'; /* Font Awesome image icon */
+    content: '\f1c5';
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
     position: absolute;
@@ -555,4 +556,53 @@ footer {
     vertical-align: middle;
     margin-right: 8px;
     display: inline-block;
+}
+
+.replica-id {
+    -webkit-user-select: all;
+    user-select: all;
+    cursor: pointer;
+}
+
+.replica-id:active {
+    background-color: var(--accent);
+    color: var(--dark);
+}
+
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--secondary);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1001;
+    font-size: 1rem;
+    opacity: 0;
+    animation: fadeInOut 2.5s ease-in-out;
+    min-width: 200px;
+    text-align: center;
+}
+
+.toast-notification.error {
+    background: #ff6b6b;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+}
+
+@media (max-width: 480px) {
+    .toast-notification {
+        bottom: 15px;
+        font-size: 0.9rem;
+        padding: 0.7rem 1.2rem;
+        min-width: 180px;
+    }
 }
