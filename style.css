@@ -405,16 +405,52 @@ footer {
     top: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
-    display: block;
     z-index: 0;
 }
 
 .slide.active {
     opacity: 1;
     z-index: 1;
+}
+
+.slide.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--secondary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.slide.error::before {
+    content: '\f1c5'; /* Font Awesome image icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: #ccc;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.slide:not(.loading) img {
+    opacity: 1;
 }
 
 .nav-btn {
@@ -455,7 +491,6 @@ footer {
     background: var(--secondary);
 }
 
-/* Dots navigation */
 .dots-nav {
     position: absolute;
     bottom: 15px;
@@ -480,7 +515,6 @@ footer {
     transform: scale(1.2);
 }
 
-/* Modal navigation enhancements */
 .modal .nav-btn {
     opacity: 0.8;
     width: 60px;
@@ -497,7 +531,6 @@ footer {
     height: 10px;
 }
 
-/* Mobile enhancements */
 @media (max-width: 768px) {
     .nav-btn {
         width: 60px;
@@ -517,9 +550,9 @@ footer {
 }
 
 .serenitea-icon {
-    height: 40px;      /* Reduce the height */
-    width: 40px;       /* Reduce the width */
+    height: 40px;
+    width: 40px;
     vertical-align: middle;
-    margin-right: 8px; /* Slightly less space */
+    margin-right: 8px;
     display: inline-block;
 }
