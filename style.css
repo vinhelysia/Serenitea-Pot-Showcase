@@ -460,15 +460,15 @@ footer {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(2, 48, 71, 0.8);
+    background: rgba(2, 48, 71, 0.9);
     color: white;
     border: none;
-    padding: 15px 20px;
+    padding: 0;
     cursor: pointer;
     font-size: 24px;
-    z-index: 2;
-    opacity: 0.8;
-    transition: opacity 0.3s ease, background-color 0.3s ease;
+    z-index: 100;
+    opacity: 1;
+    transition: background-color 0.3s ease;
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -476,6 +476,9 @@ footer {
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
 }
 
 .prev-btn {
@@ -506,12 +509,27 @@ footer {
 }
 
 .dot {
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.5);
     cursor: pointer;
     transition: all 0.3s ease;
+    padding: 8px;
+    margin: -8px;
+    position: relative;
+}
+
+.dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: inherit;
 }
 
 .dot.active {
@@ -539,10 +557,12 @@ footer {
 /* Mobile enhancements */
 @media (max-width: 768px) {
     .nav-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 28px;
-        opacity: 0.8;
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+        background: rgba(2, 48, 71, 1);
+        position: absolute;
+        z-index: 100;
     }
     
     .dot {
