@@ -1,7 +1,9 @@
+// Mobile menu toggle
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
 const navLinks = document.querySelector('.nav-links');
 
 mobileMenuBtn.addEventListener('click', () => {
+    mobileMenuBtn.classList.toggle('active');
     navLinks.classList.toggle('active');
 });
 
@@ -133,6 +135,11 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Prevent double-tap zoom on navigation elements
+    document.querySelectorAll('.nav-btn, .dot').forEach(el => {
+        el.addEventListener('touchend', e => e.preventDefault());
+    });
+    
     const galleryItems = document.querySelectorAll('.gallery-item');
     
     galleryItems.forEach(item => {
@@ -142,6 +149,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const nextBtn = item.querySelector('.next-btn');
         let currentSlide = 0;
         let slideshowInterval;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        let isSwiping = false;
         
         // Create dots navigation
         const dotsNav = document.createElement('div');
@@ -159,42 +171,58 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Function to show a specific slide
         function showSlide(index) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            slides[index].classList.add('active');
-            
-            // Update dots
-            dotsNav.querySelectorAll('.dot').forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
+            requestAnimationFrame(() => {
+                slides.forEach(slide => slide.classList.remove('active'));
+                slides[index].classList.add('active');
+                
+                // Update dots
+                dotsNav.querySelectorAll('.dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                
+                currentSlide = index;
             });
-            
-            currentSlide = index;
         }
         
-        // Swipe handling
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
+        // Enhanced touch handling
         slideshowContainer.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isSwiping = false;
         }, { passive: true });
+        
+        slideshowContainer.addEventListener('touchmove', e => {
+            if (isSwiping) return;
+            
+            touchEndX = e.touches[0].clientX;
+            touchEndY = e.touches[0].clientY;
+            
+            // Calculate distance and angle
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            const angle = Math.abs(Math.atan2(deltaY, deltaX) * 180 / Math.PI);
+            
+            // If horizontal swipe (angle < 45 degrees), prevent vertical scroll
+            if (angle < 45) {
+                e.preventDefault();
+                isSwiping = true;
+            }
+        }, { passive: false });
         
         slideshowContainer.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
-        
-        function handleSwipe() {
-            const swipeThreshold = 50;
-            const diff = touchEndX - touchStartX;
+            if (!isSwiping) return;
             
-            if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0) {
+            const deltaX = touchEndX - touchStartX;
+            const swipeThreshold = window.innerWidth * 0.15; // 15% of screen width
+            
+            if (Math.abs(deltaX) > swipeThreshold) {
+                if (deltaX > 0) {
                     prevSlide();
                 } else {
                     nextSlide();
                 }
             }
-        }
+        });
         
         // Function to go to next slide
         function nextSlide() {
@@ -207,19 +235,35 @@ document.addEventListener('DOMContentLoaded', function() {
             currentSlide = (currentSlide - 1 + slides.length) % slides.length;
             showSlide(currentSlide);
         }
-        
-        // Navigation button click handlers
+          // Navigation button click handlers
         prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             prevSlide();
             clearInterval(slideshowInterval);
-        });
+        }, true);
         
         nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             nextSlide();
             clearInterval(slideshowInterval);
-        });
+        }, true);
+
+        // Add touch event listeners specifically for buttons
+        prevBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            prevSlide();
+            clearInterval(slideshowInterval);
+        }, true);
+        
+        nextBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            nextSlide();
+            clearInterval(slideshowInterval);
+        }, true);
         
         // Initialize first slide
         showSlide(currentSlide);
@@ -267,29 +311,45 @@ function updateModalDots(currentIndex, totalSlides) {
 
 // Add modal swipe support
 let modalTouchStartX = 0;
-let modalTouchEndX = 0;
+let modalTouchStartY = 0;
+let isModalSwiping = false;
 
 modalContent.addEventListener('touchstart', e => {
-    modalTouchStartX = e.changedTouches[0].screenX;
+    modalTouchStartX = e.touches[0].clientX;
+    modalTouchStartY = e.touches[0].clientY;
+    isModalSwiping = false;
 }, { passive: true });
+
+modalContent.addEventListener('touchmove', e => {
+    if (isModalSwiping) return;
+    
+    const touchX = e.touches[0].clientX;
+    const touchY = e.touches[0].clientY;
+    const deltaX = touchX - modalTouchStartX;
+    const deltaY = touchY - modalTouchStartY;
+    const angle = Math.abs(Math.atan2(deltaY, deltaX) * 180 / Math.PI);
+    
+    if (angle < 45) {
+        e.preventDefault();
+        isModalSwiping = true;
+    }
+}, { passive: false });
 
 modalContent.addEventListener('touchend', e => {
-    modalTouchEndX = e.changedTouches[0].screenX;
-    handleModalSwipe();
-}, { passive: true });
-
-function handleModalSwipe() {
-    const swipeThreshold = 50;
-    const diff = modalTouchEndX - modalTouchStartX;
+    if (!isModalSwiping) return;
     
-    if (Math.abs(diff) > swipeThreshold) {
-        if (diff > 0) {
+    const touchEndX = e.changedTouches[0].clientX;
+    const deltaX = touchEndX - modalTouchStartX;
+    const swipeThreshold = window.innerWidth * 0.15;
+    
+    if (Math.abs(deltaX) > swipeThreshold) {
+        if (deltaX > 0) {
             prevModalImage();
         } else {
             nextModalImage();
         }
     }
-}
+});
 
 // Update modal navigation button handlers
 modalPrevBtn.addEventListener('click', prevModalImage);
