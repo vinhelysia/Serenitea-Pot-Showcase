@@ -234,17 +234,72 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // Replica ID copy functionality
+    document.querySelectorAll('.replica-id').forEach(span => {
+        span.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const id = span.dataset.id;
+            // Fallback for older browsers
+            const copyText = (text) => {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    return navigator.clipboard.writeText(text);
+                } else {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        return Promise.resolve();
+                    } catch (err) {
+                        return Promise.reject(err);
+                    } finally {
+                        document.body.removeChild(textarea);
+                    }
+                }
+            };
+
+            copyText(id).then(() => {
+                // Show toast notification
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification';
+                toast.textContent = 'Copied Replica ID!';
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.remove();
+                }, 2000);
+
+                // Update span text for additional feedback
+                span.textContent = 'Copied!';
+                setTimeout(() => {
+                    span.textContent = id;
+                }, 1000);
+            }).catch(() => {
+                // Show error toast
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification error';
+                toast.textContent = 'Failed to copy Replica ID';
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.remove();
+                }, 2000);
+            });
+        });
+    });
 });
 
 const modalContent = document.querySelector('.modal-content');
 const modalPrevBtn = document.createElement('button');
 modalPrevBtn.className = 'nav-btn prev-btn';
-modalPrevBtn.innerHTML = '&lt;';
+modalPrevBtn.innerHTML = '<';
 modalContent.appendChild(modalPrevBtn);
 
 const modalNextBtn = document.createElement('button');
 modalNextBtn.className = 'nav-btn next-btn';
-modalNextBtn.innerHTML = '&gt;';
+modalNextBtn.innerHTML = '>';
 modalContent.appendChild(modalNextBtn);
 
 const modalDotsNav = document.createElement('div');
@@ -288,16 +343,3 @@ function handleModalSwipe() {
 
 modalPrevBtn.addEventListener('click', prevModalImage);
 modalNextBtn.addEventListener('click', nextModalImage);
-
-document.querySelectorAll('.replica-id').forEach(span => {
-    span.addEventListener('click', function(e) {
-        const id = this.dataset.id;
-        navigator.clipboard.writeText(id).then(() => {
-            this.textContent = "Copied!";
-            setTimeout(() => {
-                this.textContent = id;
-            }, 1000);
-        });
-        e.stopPropagation();
-    });
-});
