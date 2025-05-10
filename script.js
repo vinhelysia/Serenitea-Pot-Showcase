@@ -343,3 +343,32 @@ function handleModalSwipe() {
 
 modalPrevBtn.addEventListener('click', prevModalImage);
 modalNextBtn.addEventListener('click', nextModalImage);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navBtn = document.querySelector('.mobile-menu-btn');
+    navBtn?.addEventListener('click', () => {
+        const expanded = navBtn.getAttribute('aria-expanded') === 'true';
+        navBtn.setAttribute('aria-expanded', String(!expanded));
+    });
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target.querySelector('img[data-src]');
+                if (img) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { rootMargin: '200px' });
+
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        observer.observe(item);
+    });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const loadingSpinner = document.querySelector('.loading-spinner');
+    loadingSpinner.style.display = 'none';
+});
