@@ -128,25 +128,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Lazy loading images with IntersectionObserver
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target.querySelector('img[data-src]');
-                if (img) {
-                    img.src = img.dataset.src;
-                    img.removeAttribute('data-src');
-                }
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { rootMargin: '200px' });
-    document.querySelectorAll('.gallery-item').forEach(item => {
-        observer.observe(item);
-    });
-
-    // 2. Gallery slideshow logic (merged from previous DOMContentLoaded)
     const galleryItems = document.querySelectorAll('.gallery-item');
+    
     galleryItems.forEach(item => {
         const slides = item.querySelectorAll('.slide');
         const slideshowContainer = item.querySelector('.slideshow-container');
@@ -154,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nextBtn = item.querySelector('.next-btn');
         let currentSlide = 0;
         let slideshowInterval;
-
+        
         const dotsNav = document.createElement('div');
         dotsNav.className = 'dots-nav';
         slides.forEach((_, index) => {
@@ -167,38 +150,32 @@ document.addEventListener('DOMContentLoaded', function() {
             dotsNav.appendChild(dot);
         });
         slideshowContainer.appendChild(dotsNav);
-
+        
         function showSlide(index) {
-            slides.forEach((slide, i) => {
-                slide.classList.remove('active');
-                // 3. Error handling for missing images
-                const img = slide.querySelector('img');
-                if (img) {
-                    slide.classList.remove('error');
-                }
-            });
+            slides.forEach(slide => slide.classList.remove('active'));
             slides[index].classList.add('active');
             dotsNav.querySelectorAll('.dot').forEach((dot, i) => {
                 dot.classList.toggle('active', i === index);
             });
             currentSlide = index;
         }
-
+        
         let touchStartX = 0;
         let touchEndX = 0;
-
+        
         slideshowContainer.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
         }, { passive: true });
-
+        
         slideshowContainer.addEventListener('touchend', e => {
             touchEndX = e.changedTouches[0].screenX;
             handleSwipe();
         }, { passive: true });
-
+        
         function handleSwipe() {
             const swipeThreshold = 50;
             const diff = touchEndX - touchStartX;
+            
             if (Math.abs(diff) > swipeThreshold) {
                 if (diff > 0) {
                     prevSlide();
@@ -207,68 +184,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-
+        
         function nextSlide() {
             currentSlide = (currentSlide + 1) % slides.length;
             showSlide(currentSlide);
         }
-
+        
         function prevSlide() {
             currentSlide = (currentSlide - 1 + slides.length) % slides.length;
             showSlide(currentSlide);
         }
-
-        if (prevBtn) {
-            prevBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                prevSlide();
-                clearInterval(slideshowInterval);
-            });
-        }
-        if (nextBtn) {
-            nextBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                nextSlide();
-                clearInterval(slideshowInterval);
-            });
-        }
-
+        
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            prevSlide();
+            clearInterval(slideshowInterval);
+        });
+        
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nextSlide();
+            clearInterval(slideshowInterval);
+        });
+        
         showSlide(currentSlide);
-
+        
         item.addEventListener('mouseenter', () => {
             slideshowInterval = setInterval(nextSlide, 3000);
         });
+        
         item.addEventListener('mouseleave', () => {
             clearInterval(slideshowInterval);
         });
     });
-
-    // 3. Error handling for missing images in slides
+    
     document.querySelectorAll('.slide img').forEach(img => {
         img.addEventListener('load', () => {
-            if (img.parentElement) img.parentElement.classList.remove('loading');
+            img.parentElement.classList.remove('loading');
         });
         img.addEventListener('error', () => {
-            if (img.parentElement) {
-                img.parentElement.classList.remove('loading');
-                img.parentElement.classList.add('error');
-            }
+            img.parentElement.classList.remove('loading');
+            img.parentElement.classList.add('error');
         });
         if (img.complete) {
             if (img.naturalWidth > 0) {
-                if (img.parentElement) img.parentElement.classList.remove('loading');
+                img.parentElement.classList.remove('loading');
             } else {
-                if (img.parentElement) img.parentElement.classList.add('error');
+                img.parentElement.classList.add('error');
             }
         }
     });
 
-    // Replica ID copy functionality (unchanged)
+    // Replica ID copy functionality
     document.querySelectorAll('.replica-id').forEach(span => {
         span.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            
             const id = span.dataset.id;
+            // Fallback for older browsers
             const copyText = (text) => {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     return navigator.clipboard.writeText(text);
@@ -287,27 +261,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             };
+
             copyText(id).then(() => {
+                // Show toast notification
                 const toast = document.createElement('div');
                 toast.className = 'toast-notification';
                 toast.textContent = 'Copied Replica ID!';
                 document.body.appendChild(toast);
-                setTimeout(() => { toast.remove(); }, 2000);
+                setTimeout(() => {
+                    toast.remove();
+                }, 2000);
+
+                // Update span text for additional feedback
                 span.textContent = 'Copied!';
-                setTimeout(() => { span.textContent = id; }, 1000);
+                setTimeout(() => {
+                    span.textContent = id;
+                }, 1000);
             }).catch(() => {
+                // Show error toast
                 const toast = document.createElement('div');
                 toast.className = 'toast-notification error';
                 toast.textContent = 'Failed to copy Replica ID';
                 document.body.appendChild(toast);
-                setTimeout(() => { toast.remove(); }, 2000);
+                setTimeout(() => {
+                    toast.remove();
+                }, 2000);
             });
         });
     });
-
-    // Hide spinner on DOMContentLoaded
-    const loadingSpinner = document.querySelector('.loading-spinner');
-    if (loadingSpinner) loadingSpinner.style.display = 'none';
 });
 
 const modalContent = document.querySelector('.modal-content');
