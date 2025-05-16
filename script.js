@@ -160,17 +160,56 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 document.addEventListener('DOMContentLoaded', function() {
     const galleryItems = document.querySelectorAll('.gallery-item');
     
+    // Handle all images loading
+    const allImages = document.querySelectorAll('img[loading="lazy"]');
+    allImages.forEach(img => {
+        // Check if already loaded
+        if (img.complete) {
+            // Image is already loaded, remove loading class from parent
+            const slideParent = img.closest('.slide.loading');
+            if (slideParent) {
+                slideParent.classList.remove('loading');
+            }
+        } else {
+            // Add event listeners for when image loads or errors
+            img.addEventListener('load', function() {
+                const slideParent = img.closest('.slide.loading');
+                if (slideParent) {
+                    slideParent.classList.remove('loading');
+                }
+            });
+            
+            img.addEventListener('error', function() {
+                const slideParent = img.closest('.slide.loading');
+                if (slideParent) {
+                    slideParent.classList.remove('loading');
+                    slideParent.classList.add('error');
+                }
+            });
+        }
+    });
+    
     galleryItems.forEach(item => {
         const slides = item.querySelectorAll('.slide');
         const slideshowContainer = item.querySelector('.slideshow-container');
-        const prevBtn = item.querySelector('.prev-btn');
-        const nextBtn = item.querySelector('.next-btn');
-        let currentSlide = 0;
-        let slideshowInterval;
+        const nextBtn = slideshowContainer.querySelector('.next-btn');
+        const prevBtn = slideshowContainer.querySelector('.prev-btn');
+        
+        if (!prevBtn || !nextBtn) return;
+        
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nextSlide();
+        });
+        
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            prevSlide();
+        });
         
         const dotsNav = document.createElement('div');
         dotsNav.className = 'dots-nav';
-        slides.forEach((_, index) => {
+        slides.forEach((slide, index) => {
             const dot = document.createElement('div');
             dot.className = 'dot' + (index === 0 ? ' active' : '');
             dot.addEventListener('click', (e) => {
@@ -398,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(item);
     });
 });
+
 // Utility function for debouncing events
 function debounce(func, wait) {
     let timeout;
@@ -409,9 +449,35 @@ function debounce(func, wait) {
     };
 }
 
+// Fix loading animation for all slides
+function fixLoadingAnimations() {
+    // Immediately fix all slides that have loading class
+    document.querySelectorAll('.slide.loading').forEach(slide => {
+        const img = slide.querySelector('img');
+        if (img) {
+            if (img.complete && img.naturalWidth > 0) {
+                // Image is already loaded
+                slide.classList.remove('loading');
+            } else {
+                // Set up load/error listeners
+                img.addEventListener('load', () => {
+                    slide.classList.remove('loading');
+                }, { once: true });
+                
+                img.addEventListener('error', () => {
+                    slide.classList.remove('loading');
+                    slide.classList.add('error');
+                }, { once: true });
+            }
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const loadingSpinner = document.querySelector('.loading-spinner');
     loadingSpinner.style.display = 'none';
+    
+    fixLoadingAnimations();
     
     // Add accessibility attributes to modal
     modal.setAttribute('role', 'dialog');
