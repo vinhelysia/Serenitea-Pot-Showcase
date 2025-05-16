@@ -13,22 +13,48 @@ const galleryItems = document.querySelectorAll('.gallery-item');
 let currentGalleryItem = null;
 let currentImageIndex = 0;
 
-function showModalImage(item, index) {
-    const images = item.querySelectorAll('.slide img');
-    currentImageIndex = index;
+// Helper function to set modal image and handle loading states
+function setModalImage(imageSrc, altText) {
     modalImg.classList.add('loading');
     const spinner = document.querySelector('.loading-spinner');
     spinner.style.display = 'block';
     
-    modalImg.src = images[currentImageIndex].src;
+    modalImg.src = imageSrc;
+    if (altText) modalImg.alt = altText;
+    
     modalImg.onload = () => {
         modalImg.classList.remove('loading');
         spinner.style.display = 'none';
+        // Preload adjacent images for smoother navigation
+        preloadAdjacentImages();
     };
+    
     modalImg.onerror = () => {
         modalImg.classList.remove('loading');
+        modalImg.classList.add('error');
         spinner.style.display = 'none';
     };
+}
+
+// Preload next and previous images for smoother transitions
+function preloadAdjacentImages() {
+    if (!currentGalleryItem) return;
+    const images = currentGalleryItem.querySelectorAll('.slide img');
+    const nextIndex = (currentImageIndex + 1) % images.length;
+    const prevIndex = (currentImageIndex - 1 + images.length) % images.length;
+    
+    [nextIndex, prevIndex].forEach(index => {
+        if (index !== currentImageIndex) {
+            const img = new Image();
+            img.src = images[index].src;
+        }
+    });
+}
+
+function showModalImage(item, index) {
+    const images = item.querySelectorAll('.slide img');
+    currentImageIndex = index;
+    setModalImage(images[currentImageIndex].src, images[currentImageIndex].alt);
     updateModalDots(currentImageIndex, images.length);
 }
 
@@ -36,19 +62,7 @@ function nextModalImage() {
     if (!currentGalleryItem) return;
     const images = currentGalleryItem.querySelectorAll('.slide img');
     currentImageIndex = (currentImageIndex + 1) % images.length;
-    modalImg.classList.add('loading');
-    const spinner = document.querySelector('.loading-spinner');
-    spinner.style.display = 'block';
-    
-    modalImg.src = images[currentImageIndex].src;
-    modalImg.onload = () => {
-        modalImg.classList.remove('loading');
-        spinner.style.display = 'none';
-    };
-    modalImg.onerror = () => {
-        modalImg.classList.remove('loading');
-        spinner.style.display = 'none';
-    };
+    setModalImage(images[currentImageIndex].src, images[currentImageIndex].alt);
     updateModalDots(currentImageIndex, images.length);
 }
 
@@ -56,19 +70,7 @@ function prevModalImage() {
     if (!currentGalleryItem) return;
     const images = currentGalleryItem.querySelectorAll('.slide img');
     currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
-    modalImg.classList.add('loading');
-    const spinner = document.querySelector('.loading-spinner');
-    spinner.style.display = 'block';
-    
-    modalImg.src = images[currentImageIndex].src;
-    modalImg.onload = () => {
-        modalImg.classList.remove('loading');
-        spinner.style.display = 'none';
-    };
-    modalImg.onerror = () => {
-        modalImg.classList.remove('loading');
-        spinner.style.display = 'none';
-    };
+    setModalImage(images[currentImageIndex].src, images[currentImageIndex].alt);
     updateModalDots(currentImageIndex, images.length);
 }
 
@@ -87,13 +89,41 @@ galleryItems.forEach(item => {
 
 window.addEventListener('keydown', (e) => {
     if (modal.style.display === 'flex') {
-        if (e.key === 'ArrowLeft' || e.key === '<') {
-            prevModalImage();
-        } else if (e.key === 'ArrowRight' || e.key === '>') {
-            nextModalImage();
-        } else if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
+        switch(e.key) {
+            case 'ArrowLeft':
+            case 'ArrowUp':
+            case 'a':
+            case 'w':
+            case '<':
+                prevModalImage();
+                e.preventDefault();
+                break;
+            case 'ArrowRight':
+            case 'ArrowDown':
+            case 'd':
+            case 's':
+            case '>':
+                nextModalImage();
+                e.preventDefault();
+                break;
+            case 'Escape':
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                e.preventDefault();
+                break;
+            case 'Home':
+                if (currentGalleryItem) {
+                    showModalImage(currentGalleryItem, 0);
+                    e.preventDefault();
+                }
+                break;
+            case 'End':
+                if (currentGalleryItem) {
+                    const images = currentGalleryItem.querySelectorAll('.slide img');
+                    showModalImage(currentGalleryItem, images.length - 1);
+                    e.preventDefault();
+                }
+                break;
         }
     }
 });
@@ -368,7 +398,48 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(item);
     });
 });
+// Utility function for debouncing events
+function debounce(func, wait) {
+    let timeout;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const loadingSpinner = document.querySelector('.loading-spinner');
     loadingSpinner.style.display = 'none';
+    
+    // Add accessibility attributes to modal
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Image viewer');
+    modalImg.setAttribute('alt', 'Enlarged view of selected image');
+    
+    // Remove loading class when images are loaded
+    document.querySelectorAll('.slide.loading img').forEach(img => {
+        if (img.complete) {
+            img.parentElement.classList.remove('loading');
+        } else {
+            img.addEventListener('load', () => {
+                img.parentElement.classList.remove('loading');
+            });
+            img.addEventListener('error', () => {
+                img.parentElement.classList.remove('loading');
+                img.parentElement.classList.add('error');
+                console.error('Failed to load image:', img.src);
+            });
+        }
+    });
+    
+    // Optimize performance by debouncing window resize events
+    window.addEventListener('resize', debounce(() => {
+        // Recalculate any size-dependent elements
+        if (modal.style.display === 'flex') {
+            // Re-center modal content if needed
+        }
+    }, 250));
 });
