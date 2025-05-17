@@ -3,221 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serenitea Pot Showcase | Genshin Impact</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="images/icon/System_Serenitea_Pot.webp">
+    <title>Serenitea Pot Guide | Genshin Impact</title>
+    <link rel="stylesheet" href="../style/style.css">
+    <link rel="icon" type="image/png" href="../images/icon/System_Serenitea_Pot.webp">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+
+    </style>
 </head>
-    <body>
+<body>
     <nav>
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="images/icon/Emblem_Serenitea_Pot.webp" alt="Serenitea Pot Icon" class="serenitea-icon">
+                <img src="../images/icon/Emblem_Serenitea_Pot.webp" alt="Serenitea Pot Icon" class="serenitea-icon">
                 Serenitea Pot
             </div>
-            <button aria-expanded="false" aria-label="Toggle navigation menu" class="mobile-menu-btn"></button>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+            </div>
+            <button aria-expanded="false" aria-label="Toggle navigation menu" class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
+
     <main>
-        <section id="gallery">
-            <h2 class="section-title">Gallery</h2>
-            <div class="gallery">
-                <div class="gallery-item">
-                    <div class="slideshow-container">                        
-                        <div class="slide active loading">
-                            <img src="images/g1/z6578437850514_35c120498051d7d100fd16d21d729c0c.webp" alt="House of Reveriee" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g1/z6578441286437_c37aed14b46bd627e33f864c24b06575.webp" alt="House of Reveriee" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g1/z6578487177395_ae1fba16a3b60bf644c0af08f9b3c7fd.webp" alt="House of Reveriee" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>House of Reveriee</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="125362941524" style="cursor:pointer; color:#219ebc;" title="Click to copy">125362941524</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://www.youtube.com/@kagariteapot" target="_blank">Kagari</a></p>
-                    </div>
+        <div class="prerequisites">
+            <h3>Pre-requirements</h3>
+            <div class="prereq-card">
+                <div class="prereq-header">
+                    <img src="../images/icon/System_Serenitea_Pot.webp" alt="Serenitea Pot Icon" class="prereq-icon">
+                    <p><strong>Unlock Requirements:</strong> After reaching Adventure Rank 28 + and completing the Archon Quest Chapter I: Act III - A New Star Approaches, the World Quest A Teapot to Call Home: Part I will be unlocked. Complete this quest to obtain the Serenitea Pot.</p>
                 </div>
-                <div class="gallery-item">
-                    <div class="slideshow-container">                        <div class="slide active loading">
-                            <img src="images/g2/z6580425516387_f5f0c2351be774d0a6497e70f60f15cd.webp" alt="Hidden Garden" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g2/z6580429777613_0f089ffdb7ebdba3132bf179b2b95579.webp" alt="Hidden Garden" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g2/z6580429777662_5f15028420db51e390ea3ba3ad898a10.webp" alt="Hidden Garden" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g2/z6580429777663_6a00838c67b38c3d1e322d12a41619be.webp" alt="Hidden Garden" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Hidden Garden</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="1405285175376" style="cursor:pointer; color:#219ebc;" title="Click to copy">1405285175376</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://www.youtube.com/@paichi_8" target="_blank">Paichi</a></p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="slideshow-container">                        <div class="slide active loading">
-                            <img src="images/g3/z6578857609768_7afec305339973abc9bd138a0c0800a9.webp" alt="Cozy Cottage" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g3/z6578861592549_af895d2bbc72aa8377b79e0a7c65bb27.webp" alt="Cozy Cottage" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g3/z6578917396516_f502dbb468f373ecffd10a09f9f7de7a.webp" alt="Cozy Cottage" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g3/z6578921815790_4a2d720b58284a9bbd1663126d6782af.webp" alt="Cozy Cottage" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Cozy Cottage</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="91003203156" style="cursor:pointer; color:#219ebc;" title="Click to copy">91003203156</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://www.youtube.com/@kagariteapot" target="_blank">Kagari</a></p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="slideshow-container">
-                        <div class="slide active loading">
-                            <img src="images/g4/z6579039586794_cc9149e599321138183b787c4ba157ac.webp" alt="Wedding Hall" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g4/z6579039597982_ec9133b5b675896cb10b67c52d9eec13.webp" alt="Wedding Hall" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Wedding Hall</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="121148049746" style="cursor:pointer; color:#219ebc;" title="Click to copy">121148049746</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://x.com/reignsn0" target="_blank">れい🌱多忙</a></p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="slideshow-container">                        <div class="slide active loading">
-                            <img src="images/g5/z6578562306907_5acddb42c21b577d7e34bc17639385f5.webp" alt="Spring Blossoms Unveiling a Tapestry of Beauty" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g5/z6578562306935_af5a3e80feb29b08ea4b732552064076.webp" alt="Spring Blossoms Unveiling a Tapestry of Beauty" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Spring Blossoms Unveiling a Tapestry of Beauty</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="60974469786" style="cursor:pointer; color:#219ebc;" title="Click to copy">60974469786</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://x.com/_saquramvo" target="_blank">音速のまりも</a></p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="slideshow-container">
-                        <div class="slide active loading">
-                            <img src="images/g6/z6585275264676_550cbb904ee2e556a09ea7263299c51f.webp" alt="Amurta Academy Biological Research Institute" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g6/z6585275264688_8dd5b8b90b7904792ca07c27224174fc.webp" alt="Amurta Academy Biological Research Institute" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g6/z6585275264689_599740a7518a4db84c30b25eb8b72886.webp" alt="Amurta Academy Biological Research Institute" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g6/z6585275264690_a86cec1a9a736508995619e8fc974388.webp" alt="Amurta Academy Biological Research Institute" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g6/z6585275264691_e038444c9d3993a263a9ebf14c00046e.webp" alt="Amurta Academy Biological Research Institute" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g6/z6585275319822_a4343c5907d832310a9a7d05ca2b764d.webp" alt="Amurta Academy Biological Research Institute" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Amurta Academy Biological Research Institute</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="344487250057" style="cursor:pointer; color:#219ebc;" title="Click to copy">344487250057</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://x.com/euroF72559" target="_blank">りよん</a></p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="slideshow-container">
-                        <div class="slide active loading">
-                            <img src="images/g7/z6590893552650_06e613ae79864aa136630cc44c816b97.webp" alt="Kuzushi Castle" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g7/z6590897776066_a7f5672366e250e6493f8f3596c452f2.webp" alt="Kuzushi Castle" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g7/z6590897776092_77aba8d8f8187e1b6117f0454ec4efd2.webp" alt="Kuzushi Castle" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g7/z6590902628767_bf94d7cbce1688f9613c240e6cde95b2.webp" alt="Kuzushi Castle" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g7/z6590935595233_345496fee5c4bb9e3045801d9a304d45.webp" alt="Kuzushi Castle" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Kuzushi Castle</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="288566981389" style="cursor:pointer; color:#219ebc;" title="Click to copy">288566981389</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://www.youtube.com/@HanzoKimura" target="_blank">HZO</a></p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="slideshow-container">
-                        <div class="slide active loading">
-                            <img src="images/g8/z6579031918230_0e23495a39e471b7e2a9c81af5dc3ad6.webp" alt="Serenitea Pot Showcase" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g8/z6579031918249_8197d3775538d90ab9b85198fa4ddeb4.webp    " alt="Serenitea Pot Showcase" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Wedding Hall</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="43752404747" style="cursor:pointer; color:#219ebc;" title="Click to copy">43752404747</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://www.facebook.com/share/16QxgvGY8h/" target="_blank">Aly Chan</a></p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <div class="slideshow-container">                        
-                        <div class="slide active loading">
-                            <img src="images/g9/z6610387371772_27a4f2329bf25953025a421cc7914501.webp" alt="Dream-Eating Bath" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g9/z6610389901887_d482f4651bf3cb91f3e327695430ed0a.webp" alt="Dream-Eating Bath" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g9/z6610395866755_e0108cea7edfad4ac37eac46ce2e5b10.webp" alt="Dream-Eating Bath" loading="lazy">
-                        </div>
-                        <div class="slide loading">
-                            <img src="images/g9/z6610395866778_752186d70bdf0f98bad6599e5a750111.webp" alt="Dream-Eating Bath" loading="lazy">
-                        </div>
-                        <button class="nav-btn prev-btn" aria-label="Previous image">&lt;</button>
-                        <button class="nav-btn next-btn" aria-label="Next image">&gt;</button>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Dream-Eating Bath</h3>
-                        <p>Replica ID: <span class="replica-id" data-id="3161947347142" style="cursor:pointer; color:#219ebc;" title="Click to copy">3161947347142</span> ( Asia ) </p>
-                        <p>Original Owner: <a href="https://x.com/masaki_teapot" target="_blank">Masaki</a></p>
+                
+                <div class="prereq-images">
+                    <div class="prereq-image-container">
+                        <img src="../images/prereq/Serenitea_Pot_Usage.webp" alt="Serenitea Pot Usage Image 1" class="prereq-image">
+                        
                     </div>
                 </div>
                 
+                <h4>Using the Serenitea Pot</h4>
+                <ul>
+                    <li>Place the Serenitea Pot gadget on a valid surface and interact with it to enter the teapot.</li>
+                    <li>If a Sub-Space Waypoint is placed inside the realm, they can be teleported to via the Serenitea Pot Map Tab.</li>
+                    <li>The Mansion can be teleported to from the Map as well.</li>
+                    <li>While inside the teapot, placing and interacting with the Serenitea Pot gadget or teleporting to a Teleport Waypoint in Teyvat will exit the teapot.</li>
+                </ul>
+                
+                <p><strong>Note:</strong> You can only build the Replica ID when you own more than 90% of the furnishing. </p>
+            </div>
+        </div>
+        <section id="guide">
+            <h2 class="section-title">Guide</h2>
+            <div class="guide">
+                <div class="section-switcher">
+                    <button class="switcher-btn active" data-section="mobile">Mobile Guide</button>
+                    <button class="switcher-btn" data-section="pc">PC Guide</button>
+                </div>
+                
+                
+                
+                <div class="section-container">
+                    <div class="section-content active" id="mobile-section">
+                        <h3>Mobile Device Guide</h3>
+                        <p>This section contains guides specifically for mobile users of Serenitea Pot.</p>
+                        <div class="guide-card">
+                            <h4>How to use Replica ID:</h4>
+                            <ul>
+                                <li>Select the Replica ID that you wanted and copy it, then enter the Serenitea Pot. When you are inside the Serenitea Pot, tap on the <img src="../images/prereq/icon-ezgif.com-png-to-webp-converter.webp" alt="Serenitea Pot Icon" height="20" width="20"> on the upper right corner of the screen. </li>
+                                <img src="../images/prereq/moblie.PNG" alt="Serenitea Pot Icon" height="100" width="500">
+                                <li>After that, choose "Replica" </li>    
+                                <img src="../images/prereq/step1.PNG" alt="Serenitea Pot Icon" height="300" width="500">
+                                <li>After that, choose "Use Replica ID" </li>  
+                                <img src="../images/prereq/step2.PNG" alt="Serenitea Pot Icon" height="300" width="500">
+                                <li>After that, you can paste the Replica ID by pressing the paste button then "Search" </li>  
+                                <img src="../images/prereq/step3.PNG" alt="Serenitea Pot Icon" height="300" width="500">
+                                <li>After all that, you can now transfer the replica and start building it</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="section-content" id="pc-section">
+                        <h3>PC Guide</h3>
+                        <p>This section contains guides specifically for PC users of Serenitea Pot.</p>
+                        <div class="guide-card">
+                            <h4>How to use Replica ID:</h4>
+                            <ul>
+                                <li>Select the Replica ID that you wanted and copy it, then enter the Serenitea Pot. When you are inside the Serenitea Pot, press F6. </li>
+                                <li>After that, click on "Replica" </li>    
+                                <img src="../images/prereq/step1.PNG" alt="Serenitea Pot Icon" height="300" width="500">
+                                <li>After that, click on "Use Replica ID" </li>  
+                                <img src="../images/prereq/step2.PNG" alt="Serenitea Pot Icon" height="300" width="500">
+                                <li>After that, paste the Replica ID by pressing the paste button or Ctrl + V then click on "Search" </li>  
+                                <img src="../images/prereq/step3.PNG" alt="Serenitea Pot Icon" height="300" width="500">
+                                <li>After all that, you can now transfer the replica and start building it</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
+
     <footer>
         <div class="footer-content">
             <p>© 2025 Serenitea Pot Showcase</p>
@@ -229,13 +117,8 @@
             <p>This is a fan-made website. Not affiliated with miHoYo/HoYoverse or Genshin Impact.</p>
         </div>
     </footer>
-    <div class="modal" id="imageModal">
-        <button class="close-modal">&times;</button>
-        <div class="modal-content">
-            <div class="loading-spinner"></div>
-            <img id="modalImage" src="" alt="Enlarged view">
-        </div>
-    </div>
-    <script defer="" src="script.js"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93d288da7a2d1395',t:'MTc0NjgwNzczNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+    <script src="../script.js"></script>
+    <script src="../script/table.js"></script>
+</body>
 </html>
