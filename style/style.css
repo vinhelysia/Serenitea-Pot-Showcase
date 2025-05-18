@@ -760,6 +760,31 @@ a:focus:not(:focus-visible) {
             padding-bottom: 20px;
         }
         
+        /* Guide responsive images */
+        .guide-img-small {
+            width: 20px;
+            height: auto;
+            vertical-align: middle;
+        }
+        
+        .guide-img-medium {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            margin: 10px 0;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .guide-img-large {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            margin: 15px 0;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
         .prerequisites h3 {
             color: var(--dark);
             margin-bottom: 15px;
