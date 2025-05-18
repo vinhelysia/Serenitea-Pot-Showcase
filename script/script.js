@@ -1,3 +1,61 @@
+document.addEventListener('DOMContentLoaded', function() {
+
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        const designTypeSpan = item.querySelector('.design-type');
+        if (!designTypeSpan) return; 
+        
+        const designKey = designTypeSpan.dataset.design;
+        if (!designKey) return; 
+        
+
+        if (designTypes[designKey]) {
+            designTypeSpan.textContent = designTypes[designKey];
+        }
+
+        const locationSpan = item.querySelector('.location-type');
+        if (!locationSpan) return;
+        
+    
+        const locationParagraph = locationSpan.closest('p');
+        
+        if (designKey === 'exterior') {
+            // For exterior, use realm and change label
+            const realmKey = locationSpan.dataset.realm;
+            if (realmKey && realmNames[realmKey]) {
+                locationSpan.textContent = realmNames[realmKey];
+                // Update label to "Realm:"
+                if (locationParagraph) {
+                    locationParagraph.firstChild.textContent = "Realm: ";
+                }
+            }
+        } else if (designKey === 'interior') {
+            // For interior, use mansion and change label
+            const mansionKey = locationSpan.dataset.mansion;
+            if (mansionKey && mansionNames[mansionKey]) {
+                locationSpan.textContent = mansionNames[mansionKey];
+                // Update label to "Mansion:"
+                if (locationParagraph) {
+                    locationParagraph.firstChild.textContent = "Mansion: ";
+                }
+            }
+        }
+    });
+    
+    // For any direct realm or mansion spans not handled above
+    document.querySelectorAll('.realm-type').forEach(span => {
+        const realmKey = span.dataset.realm;
+        if (realmKey && realmNames[realmKey]) {
+            span.textContent = realmNames[realmKey];
+        }
+    });
+    
+    document.querySelectorAll('.mansion-type').forEach(span => {
+        const mansionKey = span.dataset.mansion;
+        if (mansionKey && mansionNames[mansionKey]) {
+            span.textContent = mansionNames[mansionKey];
+        }
+    });
+});
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
 const navLinks = document.querySelector('.nav-links');
 
