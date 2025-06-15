@@ -224,6 +224,44 @@ const showcaseData = [
             "images/g12/z6688773948457_0079e1f5bbfd3ecb06b5399af62278db.webp",
             "images/g12/z6688777446967_0a2e95d784fe81b2dcb157152efbb1a5.webp"
         ]
+    },
+    {
+        id: 13,
+        title: "Idyllic Tranquility",
+        designType: "ex",
+        realmType: "fontaine",
+        mansionType: null,
+        replicaId: "22289973721",
+        server: "Asia",
+        owner: {
+            name: "Raillou",
+            url: "https://www.hoyolab.com/accountCenter/postList?id=85419024"
+        },
+        images: [
+            "images/g13/1.webp",
+            "images/g13/image_2025-06-13_12-03-13.webp"
+        ]
+    },
+    {
+        id: 14,
+        title: "Windsong Canopy",
+        designType: "ex",
+        realmType: "sumeru",
+        mansionType: null,
+        replicaId: "451781479228",
+        server: "Asia",
+        owner: {
+            name: "Tanje-kun",
+            url: "https://www.youtube.com/@tanje-kun"
+        },
+        images: [
+            "images/g14/1.webp",
+            "images/g14/2.webp",
+            "images/g14/3.webp",
+            "images/g14/4.webp",
+            "images/g14/5.webp",
+            "images/g14/6.webp"
+        ]
     }
 ];
 
