@@ -95,7 +95,7 @@ const showcaseData = [
         title: "Amurta Academy Biological Research Institute",
         designType: "in", // interior
         realmType: null,
-        mansionType: "sumreru",
+        mansionType: "sumeru",
         replicaId: "344487250057",
         server: "Asia",
         owner: {
@@ -261,6 +261,25 @@ const showcaseData = [
             "images/g14/4.webp",
             "images/g14/5.webp",
             "images/g14/6.webp"
+        ]
+    },
+    {
+        id: 15,
+        title: "Divine Jade Sanctum",
+        designType: "ex",
+        realmType: "liyue",
+        mansionType: null,
+        replicaId: "288579042204",
+        server: "Asia",
+        owner: {
+            name: "Tanje-kun",
+            url: "https://www.youtube.com/@tanje-kun"
+        },
+        images: [
+            "images/g15/1.webp",
+            "images/g15/2.webp",
+            "images/g15/3.webp",
+            "images/g15/4.webp"
         ]
     }
 ];
