@@ -5,19 +5,23 @@ const designTypes = {
 };
 
 const realmNames = {
-    'fontaine': 'Fontaine',
-    'mond': 'Mondstadt', 
-    'liyue': 'Liyue',
-    'sumeru': 'Sumeru',
-    'ina': 'Inazuma'
+    'fontaine': 'Swirling Isles',
+    'mond': 'Cool Isle', 
+    'liyue': 'Emerald Peak',
+    'natlan': 'Tletl Ilhuicatl',
+    'sumeru': 'Sublime Spicewood',
+    'ina': 'Silken Courtyard',
+    'liyuefloat': 'Floating Abode',
+    
 };
 
 const mansionNames = {
-    'fontaine': 'Fontaine Mansion',
-    'mond': 'Mondstadt Mansion',
-    'liyue': 'Liyue Mansion', 
-    'sumeru': 'Sumeru Mansion',
-    'ina': 'Inazuma Mansion'
+    'fontaine': 'Fontaine Villa: Illusory Annex',
+    'mond': 'Mondstadt Mansion: Windward Manor',
+    'liyue': 'Liyue Estate: Exquisite Mansion', 
+    'sumeru': 'Sumeru Mansion: Meditative Retreat',
+    'ina': 'Inazuman Walled House: Refined Estate',
+    'natlan': 'Natlan Dwelling: Lofty Tower',
 };
 
 // Generate gallery items from showcase data
