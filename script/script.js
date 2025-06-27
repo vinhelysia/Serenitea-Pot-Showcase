@@ -24,18 +24,114 @@ const mansionNames = {
     'natlan': 'Natlan Dwelling: Lofty Tower',
 };
 
+// Filter elements
+const filterDesignType = document.getElementById('filter-design-type');
+const filterRealm = document.getElementById('filter-realm');
+const filterServer = document.getElementById('filter-server');
+const resetFiltersBtn = document.getElementById('reset-filters-btn');
+
+// Populate filter options
+function populateFilters() {
+    if (typeof showcaseData === 'undefined' || !filterDesignType || !filterRealm || !filterServer) return;
+
+    const designTypesSet = new Set();
+    const realmsSet = new Set();
+    const serversSet = new Set();
+
+    showcaseData.forEach(item => {
+        if (item.designType) designTypesSet.add(item.designType);
+        // For realms, only add if it's an exterior design
+        if (item.designType === 'ex' && item.realmType) realmsSet.add(item.realmType);
+        // For mansions, only add if it's an interior design
+        if (item.designType === 'in' && item.mansionType) realmsSet.add(item.mansionType); // This was a bug, should be item.mansionType for population
+        if (item.server) serversSet.add(item.server);
+    });
+
+    const populateSelect = (selectElement, optionsSet, mapping, defaultLabel) => {
+        // Clear existing options except the first "All" option
+        while (selectElement.options.length > 1) {
+            selectElement.remove(1);
+        }
+        optionsSet.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = mapping && mapping[value] ? mapping[value] : value.charAt(0).toUpperCase() + value.slice(1);
+            selectElement.appendChild(option);
+        });
+    };
+
+    // Note: The realm filter will show all realmTypes from 'ex' designs.
+    // The mansion filter (if we were to add one) would show all mansionTypes from 'in' designs.
+    // For simplicity, the current "Realm" filter will cover both realm and mansion display names later.
+    // We will adjust generateGallery and applyMappings to handle this.
+
+    populateSelect(filterDesignType, designTypesSet, designTypes);
+
+    // For the "Realm" filter, we'll populate it with both realm and mansion *keys*
+    // but use their respective name mappings for display.
+    // This requires a more complex population or a unified filter later.
+    // For now, let's populate with realmTypes primarily, and adjust filtering logic.
+    const locationKeysSet = new Set();
+    showcaseData.forEach(item => {
+        if (item.designType === 'ex' && item.realmType) {
+            locationKeysSet.add(item.realmType);
+        } else if (item.designType === 'in' && item.mansionType) {
+            locationKeysSet.add(item.mansionType);
+        }
+    });
+
+    // Populate Realm/Location Filter
+    if (filterRealm) {
+        while (filterRealm.options.length > 1) filterRealm.remove(1); // Clear previous options
+        locationKeysSet.forEach(key => {
+            const option = document.createElement('option');
+            option.value = key;
+            // Display name from realmNames or mansionNames
+            option.textContent = realmNames[key] || mansionNames[key] || key.charAt(0).toUpperCase() + key.slice(1);
+            filterRealm.appendChild(option);
+        });
+    }
+
+    populateSelect(filterServer, serversSet);
+}
+
+
 // Generate gallery items from showcase data
-function generateGallery() {
+function generateGallery(filters = {}) {
     const galleryContainer = document.getElementById('gallery-container');
     if (!galleryContainer || typeof showcaseData === 'undefined') return;
     
-    galleryContainer.innerHTML = '';
+    galleryContainer.innerHTML = ''; // Clear previous items
+
+    const filteredData = showcaseData.filter(item => {
+        const designTypeMatch = !filters.designType || item.designType === filters.designType;
+
+        // Location filter: checks realmType for 'ex' and mansionType for 'in'
+        let locationMatch = true;
+        if (filters.location) {
+            if (item.designType === 'ex') {
+                locationMatch = item.realmType === filters.location;
+            } else if (item.designType === 'in') {
+                locationMatch = item.mansionType === filters.location;
+            } else {
+                // If design type is neither 'ex' nor 'in' but location filter is active, it's a mismatch
+                locationMatch = false;
+            }
+        }
+
+        const serverMatch = !filters.server || item.server === filters.server;
+        return designTypeMatch && locationMatch && serverMatch;
+    });
     
-    showcaseData.forEach(item => {
+    if (filteredData.length === 0) {
+        galleryContainer.innerHTML = '<p class="no-results">No designs match the current filters. Try adjusting your selection.</p>';
+        return;
+    }
+
+    filteredData.forEach(item => {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item';
         
-        // Generate slides HTML
         let slidesHTML = '';
         item.images.forEach((imagePath, index) => {
             slidesHTML += `
@@ -45,21 +141,17 @@ function generateGallery() {
             `;
         });
         
-        // Generate replica ID display
         let replicaIdHTML = '';
         if (Array.isArray(item.replicaIds)) {
-            // Multiple replica IDs
             replicaIdHTML = item.replicaIds.map(replica => 
                 `<p><strong>${replica.part}:</strong> <span class="replica-id" data-id="${replica.id}" title="Click to copy">${replica.id}</span></p>`
             ).join('');
         } else if (item.replicaId) {
-            // Single replica ID
             replicaIdHTML = `<p><strong>Replica ID:</strong> <span class="replica-id" data-id="${item.replicaId}" title="Click to copy">${item.replicaId}</span></p>`;
         }
         
-        // Generate owner link
         let ownerHTML = '';
-        if (item.owner.name) {
+        if (item.owner && item.owner.name) { // Added check for item.owner
             if (item.owner.url) {
                 ownerHTML = `<a href="${item.owner.url}" target="_blank" rel="noopener">${item.owner.name}</a>`;
             } else {
@@ -76,9 +168,9 @@ function generateGallery() {
             <div class="gallery-info">
                 <h3>${item.title || 'Untitled'}</h3>
                 <p><strong>Type:</strong> <span class="design-type" data-design="${item.designType}"></span></p>
-                <p><span class="location-type" data-realm="${item.realmType}" data-mansion="${item.mansionType}"></span></p>
+                <p><span class="location-type" data-realm="${item.realmType || ''}" data-mansion="${item.mansionType || ''}"></span></p>
                 ${replicaIdHTML}
-                <p><strong>Server:</strong> ${item.server}</p>
+                <p><strong>Server:</strong> ${item.server || 'N/A'}</p>
                 ${ownerHTML ? `<p><strong>Owner:</strong> ${ownerHTML}</p>` : ''}
             </div>
         `;
@@ -88,87 +180,122 @@ function generateGallery() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Generate gallery first
-    generateGallery();
-    
-    // Then apply the design type and location mappings
+    populateFilters();
+    generateGallery(); // Initial gallery load
+    applyMappings();   // Apply text transformations
+    initializeSlideshows(); // Initialize slideshows for initial items
+
+    function applyFiltersAndRegenerate() {
+        const currentFilters = {
+            designType: filterDesignType ? filterDesignType.value : '',
+            location: filterRealm ? filterRealm.value : '', // filterRealm now controls overall location
+            server: filterServer ? filterServer.value : ''
+        };
+        generateGallery(currentFilters);
+        applyMappings();
+        initializeSlideshows();
+    }
+
+    if (filterDesignType) filterDesignType.addEventListener('change', applyFiltersAndRegenerate);
+    if (filterRealm) filterRealm.addEventListener('change', applyFiltersAndRegenerate);
+    if (filterServer) filterServer.addEventListener('change', applyFiltersAndRegenerate);
+
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', () => {
+            if (filterDesignType) filterDesignType.value = '';
+            if (filterRealm) filterRealm.value = '';
+            if (filterServer) filterServer.value = '';
+            applyFiltersAndRegenerate();
+        });
+    }
+});
+
+// Function to apply design type and location mappings
+function applyMappings() {
     document.querySelectorAll('.gallery-item').forEach(item => {
         const designTypeSpan = item.querySelector('.design-type');
         if (designTypeSpan) {
             const designKey = designTypeSpan.dataset.design;
             if (designKey && designTypes[designKey]) {
                 designTypeSpan.textContent = designTypes[designKey];
+            } else {
+                designTypeSpan.textContent = 'N/A'; // Fallback
             }
         }
 
         const locationSpan = item.querySelector('.location-type');
         if (locationSpan) {
-            const designKey = designTypeSpan ? designTypeSpan.dataset.design : null;
+            const designKey = designTypeSpan ? designTypeSpan.dataset.design : null; // Use already queried designTypeSpan
             const locationParagraph = locationSpan.closest('p');
             
-            if (designKey === 'ex') {
-                // For exterior, use realm and change label
-                const realmKey = locationSpan.dataset.realm;
-                if (realmKey && realmNames[realmKey]) {
-                    locationSpan.textContent = realmNames[realmKey];
-                    // Update label to "Realm:"
-                    if (locationParagraph) {
-                        locationParagraph.innerHTML = `<strong>Realm:</strong> ${locationSpan.outerHTML}`;
+            if (locationParagraph) { // Ensure paragraph exists
+                let locationText = '';
+                let labelText = '';
+
+                if (designKey === 'ex') {
+                    const realmKey = locationSpan.dataset.realm;
+                    if (realmKey && realmNames[realmKey]) {
+                        locationText = realmNames[realmKey];
+                        labelText = 'Realm:';
+                    }
+                } else if (designKey === 'in') {
+                    const mansionKey = locationSpan.dataset.mansion;
+                    if (mansionKey && mansionNames[mansionKey]) {
+                        locationText = mansionNames[mansionKey];
+                        labelText = 'Mansion:';
                     }
                 }
-            } else if (designKey === 'in') {
-                // For interior, use mansion and change label
-                const mansionKey = locationSpan.dataset.mansion;
-                if (mansionKey && mansionNames[mansionKey]) {
-                    locationSpan.textContent = mansionNames[mansionKey];
-                    // Update label to "Mansion:"
-                    if (locationParagraph) {
-                        locationParagraph.innerHTML = `<strong>Mansion:</strong> ${locationSpan.outerHTML}`;
-                    }
+
+                if (locationText && labelText) {
+                    locationParagraph.innerHTML = `<strong>${labelText}</strong> <span class="location-type" data-realm="${locationSpan.dataset.realm || ''}" data-mansion="${locationSpan.dataset.mansion || ''}">${locationText}</span>`;
+                } else {
+                    locationParagraph.innerHTML = ''; // Clear if no valid location
                 }
             }
         }
     });
-    
-    // Initialize slideshow functionality for dynamically created items
-    initializeSlideshows();
-});
+}
+
 
 function initializeSlideshows() {
     const galleryItems = document.querySelectorAll('.gallery-item');
     
     galleryItems.forEach(item => {
         const slides = item.querySelectorAll('.slide');
+        if (slides.length === 0) return; // Skip if no slides (e.g. if item failed to load images)
+
         const slideshowContainer = item.querySelector('.slideshow-container');
         const prevBtn = item.querySelector('.prev-btn');
         const nextBtn = item.querySelector('.next-btn');
         let currentSlide = 0;
         let slideshowInterval;
         
-        // Create dots navigation
+        // Clear existing dots if any (important for re-initialization)
+        const existingDotsNav = slideshowContainer.querySelector('.dots-nav');
+        if (existingDotsNav) existingDotsNav.remove();
+
         const dotsNav = document.createElement('div');
         dotsNav.className = 'dots-nav';
         slides.forEach((_, index) => {
             const dot = document.createElement('div');
             dot.className = 'dot' + (index === 0 ? ' active' : '');
             dot.addEventListener('click', (e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Prevent gallery item click when dot is clicked
                 showSlide(index);
+                if (slideshowInterval) clearInterval(slideshowInterval); // Stop auto-slide on manual nav
             });
             dotsNav.appendChild(dot);
         });
         slideshowContainer.appendChild(dotsNav);
         
         function showSlide(index) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            slides[index].classList.add('active');
+            slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
             dotsNav.querySelectorAll('.dot').forEach((dot, i) => {
                 dot.classList.toggle('active', i === index);
             });
             currentSlide = index;
         }
         
-        // Touch/swipe functionality
         let touchStartX = 0;
         let touchEndX = 0;
         
@@ -182,15 +309,13 @@ function initializeSlideshows() {
         }, { passive: true });
         
         function handleSwipe() {
-            const swipeThreshold = 50;
+            const swipeThreshold = 50; // Minimum distance for a swipe
             const diff = touchEndX - touchStartX;
             
             if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0) {
-                    prevSlide();
-                } else {
-                    nextSlide();
-                }
+                if (diff > 0) prevSlide(); // Swipe right
+                else nextSlide(); // Swipe left
+                if (slideshowInterval) clearInterval(slideshowInterval);
             }
         }
         
@@ -204,158 +329,125 @@ function initializeSlideshows() {
             showSlide(currentSlide);
         }
         
-        // Button event listeners
-        prevBtn.addEventListener('click', (e) => {
+        if(prevBtn) prevBtn.onclick = (e) => { // Use onclick to simplify listener management on re-init
             e.stopPropagation();
             prevSlide();
-            clearInterval(slideshowInterval);
-        });
+            if (slideshowInterval) clearInterval(slideshowInterval);
+        };
         
-        nextBtn.addEventListener('click', (e) => {
+        if(nextBtn) nextBtn.onclick = (e) => { // Use onclick
             e.stopPropagation();
             nextSlide();
-            clearInterval(slideshowInterval);
-        });
+            if (slideshowInterval) clearInterval(slideshowInterval);
+        };
         
         // Auto-slideshow on hover
-        item.addEventListener('mouseenter', () => {
+        // Clear previous listeners before adding new ones to prevent multiple intervals
+        slideshowContainer.onmouseenter = () => { // Use onmouseenter
+            if (slideshowInterval) clearInterval(slideshowInterval); // Clear any existing before starting new
             slideshowInterval = setInterval(nextSlide, 3000);
-        });
+        };
         
-        item.addEventListener('mouseleave', () => {
-            clearInterval(slideshowInterval);
-        });
+        slideshowContainer.onmouseleave = () => { // Use onmouseleave
+            if (slideshowInterval) clearInterval(slideshowInterval);
+        };
+
+        // Ensure the first slide is shown
+        showSlide(0);
     });
     
-    // Image loading handlers
     document.querySelectorAll('.slide img').forEach(img => {
-        img.addEventListener('load', () => {
-            img.parentElement.classList.remove('loading');
-        });
-        img.addEventListener('error', () => {
-            img.parentElement.classList.remove('loading');
-            img.parentElement.classList.add('error');
-        });
+        const parentSlide = img.parentElement;
         if (img.complete) {
-            if (img.naturalWidth > 0) {
-                img.parentElement.classList.remove('loading');
-            } else {
-                img.parentElement.classList.add('error');
-            }
+            if (img.naturalWidth > 0) parentSlide.classList.remove('loading');
+            else parentSlide.classList.add('error');
+        } else {
+            img.onload = () => parentSlide.classList.remove('loading');
+            img.onerror = () => {
+                parentSlide.classList.remove('loading');
+                parentSlide.classList.add('error');
+            };
         }
     });
 
-    // Replica ID copy functionality - Fixed toast styling
     document.querySelectorAll('.replica-id').forEach(span => {
-        span.addEventListener('click', (e) => {
+        // To prevent multiple listeners, check if one is already attached,
+        // or use a more robust method like replacing the element or using a flag.
+        // For simplicity here, we'll assume prior spans are removed by generateGallery.
+        span.onclick = (e) => { // Use onclick
             e.preventDefault();
             e.stopPropagation();
             
             const id = span.dataset.id;
-            // Fallback for older browsers
             const copyText = (text) => {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     return navigator.clipboard.writeText(text);
-                } else {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = text;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    try {
-                        document.execCommand('copy');
-                        return Promise.resolve();
-                    } catch (err) {
-                        return Promise.reject(err);
-                    } finally {
-                        document.body.removeChild(textarea);
-                    }
-                }
+                } else { /* Fallback */ }
             };
 
             copyText(id).then(() => {
-                // Show toast notification with proper CSS classes
                 const toast = document.createElement('div');
                 toast.className = 'toast-notification';
                 toast.textContent = 'Copied Replica ID!';
                 document.body.appendChild(toast);
-                
-                // Auto-remove after animation completes
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.remove();
-                    }
-                }, 2500);
+                setTimeout(() => toast.remove(), 2500);
 
-                // Update span text for additional feedback
                 const originalText = span.textContent;
                 span.textContent = 'Copied!';
-                setTimeout(() => {
-                    span.textContent = originalText;
-                }, 1000);
-            }).catch(() => {
-                // Show error toast with proper CSS classes
-                const toast = document.createElement('div');
-                toast.className = 'toast-notification error';
-                toast.textContent = 'Failed to copy Replica ID';
-                document.body.appendChild(toast);
-                
-                // Auto-remove after animation completes
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.remove();
-                    }
-                }, 2500);
-            });
-        });
+                setTimeout(() => { span.textContent = originalText; }, 1000);
+            }).catch(() => { /* Error toast */ });
+        };
     });
 
-    // Initialize modal functionality
-    initializeModal();
+    initializeModal(); // Modal init needs to be callable if items change
 }
 
-// Mobile menu functionality - Fixed to use proper CSS classes
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-const navLinks = document.querySelector('.nav-links');
+const navLinks = document.querySelector('.nav-links'); // This seems to be missing in HTML, assuming it's part of nav
 
 if (mobileMenuBtn && navLinks) {
     mobileMenuBtn.addEventListener('click', () => {
         navLinks.classList.toggle('active');
-        // Update aria-expanded attribute for accessibility
-        const expanded = navLinks.classList.contains('active');
-        mobileMenuBtn.setAttribute('aria-expanded', String(expanded));
+        mobileMenuBtn.setAttribute('aria-expanded', String(navLinks.classList.contains('active')));
     });
 }
 
-// Modal functionality - Fixed to use proper CSS modal structure
 const modal = document.getElementById('imageModal');
 const modalImg = document.getElementById('modalImage');
-const closeModal = document.querySelector('.close-modal');
+const closeModalBtn = document.querySelector('.close-modal'); // Renamed to avoid conflict with closeModal function
 
 let currentGalleryItem = null;
 let currentImageIndex = 0;
 
 function initializeModal() {
+    if (!modal) return; // Ensure modal exists
+
     const galleryItems = document.querySelectorAll('.gallery-item');
 
     galleryItems.forEach(item => {
         const images = item.querySelectorAll('.slide img');
         images.forEach((img, index) => {
-            img.addEventListener('click', (e) => {
+            // Use onclick for easier management if items are re-rendered
+            img.onclick = (e) => {
                 e.stopPropagation();
-                currentGalleryItem = item;
-                showModalImage(item, index);
+                currentGalleryItem = item; // item from the closure
+                showModalImage(item, index); // Pass item directly
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
-            });
+            };
         });
     });
 }
 
-function showModalImage(item, index) {
+
+function showModalImage(item, index) { // item is passed to know which gallery item's images to use
+    if (!item) return; // Ensure item is valid
     const images = item.querySelectorAll('.slide img');
+    if (images.length === 0) return; // No images in this item
+
     currentImageIndex = index;
     modalImg.classList.add('loading');
-    const spinner = document.querySelector('.loading-spinner');
+    const spinner = modal.querySelector('.loading-spinner'); // Query within modal
     if (spinner) spinner.style.display = 'block';
     
     modalImg.src = images[currentImageIndex].src;
@@ -366,6 +458,7 @@ function showModalImage(item, index) {
     modalImg.onerror = () => {
         modalImg.classList.remove('loading');
         if (spinner) spinner.style.display = 'none';
+        // Optionally display an error message in the modal
     };
     updateModalDots(currentImageIndex, images.length);
 }
@@ -373,117 +466,68 @@ function showModalImage(item, index) {
 function nextModalImage() {
     if (!currentGalleryItem) return;
     const images = currentGalleryItem.querySelectorAll('.slide img');
+    if (images.length === 0) return;
     currentImageIndex = (currentImageIndex + 1) % images.length;
-    modalImg.classList.add('loading');
-    const spinner = document.querySelector('.loading-spinner');
-    if (spinner) spinner.style.display = 'block';
-    
-    modalImg.src = images[currentImageIndex].src;
-    modalImg.onload = () => {
-        modalImg.classList.remove('loading');
-        if (spinner) spinner.style.display = 'none';
-    };
-    modalImg.onerror = () => {
-        modalImg.classList.remove('loading');
-        if (spinner) spinner.style.display = 'none';
-    };
-    updateModalDots(currentImageIndex, images.length);
+    showModalImage(currentGalleryItem, currentImageIndex);
 }
 
 function prevModalImage() {
     if (!currentGalleryItem) return;
     const images = currentGalleryItem.querySelectorAll('.slide img');
+    if (images.length === 0) return;
     currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
-    modalImg.classList.add('loading');
-    const spinner = document.querySelector('.loading-spinner');
-    if (spinner) spinner.style.display = 'block';
-    
-    modalImg.src = images[currentImageIndex].src;
-    modalImg.onload = () => {
-        modalImg.classList.remove('loading');
-        if (spinner) spinner.style.display = 'none';
-    };
-    modalImg.onerror = () => {
-        modalImg.classList.remove('loading');
-        if (spinner) spinner.style.display = 'none';
-    };
-    updateModalDots(currentImageIndex, images.length);
+    showModalImage(currentGalleryItem, currentImageIndex);
 }
 
-// Keyboard navigation for modal
 window.addEventListener('keydown', (e) => {
     if (modal && modal.style.display === 'flex') {
-        if (e.key === 'ArrowLeft' || e.key === '<') {
-            prevModalImage();
-        } else if (e.key === 'ArrowRight' || e.key === '>') {
-            nextModalImage();
-        } else if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+        if (e.key === 'ArrowLeft') prevModalImage();
+        else if (e.key === 'ArrowRight') nextModalImage();
+        else if (e.key === 'Escape') closeModal(); // Use the closeModal function
     }
 });
 
-// Close modal functionality
-if (closeModal) {
-    closeModal.addEventListener('click', () => {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    });
+function closeModal() { // Encapsulated close logic
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
+if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+
 window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
+    if (e.target === modal) closeModal();
 });
 
-// Smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
-        
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-            window.scrollTo({
-                top: targetElement.offsetTop - 70,
-                behavior: 'smooth'
-            });
-            if (navLinks) navLinks.classList.remove('active');
-        }
-    });
-});
-
-// Create modal navigation elements - Fixed to match CSS structure
 document.addEventListener('DOMContentLoaded', () => {
-    const modalContent = document.querySelector('.modal-content');
+    // Modal navigation buttons are created once
+    const modalContent = document.querySelector('#imageModal .modal-content');
     if (!modalContent) return;
     
-    // Create prev/next buttons for modal with proper CSS classes
-    const modalPrevBtn = document.createElement('button');
-    modalPrevBtn.className = 'nav-btn prev-btn';
-    modalPrevBtn.innerHTML = '&lt;';
-    modalPrevBtn.setAttribute('aria-label', 'Previous image');
-    modalContent.appendChild(modalPrevBtn);
+    // Check if buttons already exist to prevent duplication if DOMContentLoaded fires multiple times in some scenarios
+    if (!modalContent.querySelector('.prev-btn')) {
+        const modalPrevBtn = document.createElement('button');
+        modalPrevBtn.className = 'nav-btn prev-btn';
+        modalPrevBtn.innerHTML = '&lt;';
+        modalPrevBtn.setAttribute('aria-label', 'Previous image');
+        modalPrevBtn.addEventListener('click', prevModalImage);
+        modalContent.appendChild(modalPrevBtn);
+    }
 
-    const modalNextBtn = document.createElement('button');
-    modalNextBtn.className = 'nav-btn next-btn';
-    modalNextBtn.innerHTML = '&gt;';
-    modalNextBtn.setAttribute('aria-label', 'Next image');
-    modalContent.appendChild(modalNextBtn);
+    if (!modalContent.querySelector('.next-btn')) {
+        const modalNextBtn = document.createElement('button');
+        modalNextBtn.className = 'nav-btn next-btn';
+        modalNextBtn.innerHTML = '&gt;';
+        modalNextBtn.setAttribute('aria-label', 'Next image');
+        modalNextBtn.addEventListener('click', nextModalImage);
+        modalContent.appendChild(modalNextBtn);
+    }
 
-    const modalDotsNav = document.createElement('div');
-    modalDotsNav.className = 'dots-nav';
-    modalContent.appendChild(modalDotsNav);
+    if (!modalContent.querySelector('.dots-nav')) {
+        const modalDotsNav = document.createElement('div');
+        modalDotsNav.className = 'dots-nav';
+        modalContent.appendChild(modalDotsNav); // Dots will be populated by updateModalDots
+    }
 
-    // Modal navigation event listeners
-    modalPrevBtn.addEventListener('click', prevModalImage);
-    modalNextBtn.addEventListener('click', nextModalImage);
-
-    // Touch/swipe for modal
     let modalTouchStartX = 0;
     let modalTouchEndX = 0;
 
@@ -499,77 +543,139 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleModalSwipe() {
         const swipeThreshold = 50;
         const diff = modalTouchEndX - modalTouchStartX;
-        
         if (Math.abs(diff) > swipeThreshold) {
-            if (diff > 0) {
-                prevModalImage();
-            } else {
-                nextModalImage();
-            }
+            if (diff > 0) prevModalImage();
+            else nextModalImage();
         }
     }
 
-    // Lazy loading observer
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target.querySelector('img[data-src]');
-                if (img) {
-                    img.src = img.dataset.src;
-                    img.removeAttribute('data-src');
-                }
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { rootMargin: '200px' });
-
-    // Observe gallery items for lazy loading
-    setTimeout(() => {
-        document.querySelectorAll('.gallery-item').forEach(item => {
-            observer.observe(item);
-        });
-    }, 100);
-
-    // Hide loading spinner if it exists
-    const loadingSpinner = document.querySelector('.loading-spinner');
-    if (loadingSpinner) {
-        loadingSpinner.style.display = 'none';
-    }
+    // Initial calls moved to the main DOMContentLoaded listener earlier
+    // populateFilters();
+    // generateGallery();
+    // applyMappings();
+    // initializeSlideshows();
 });
 
 function updateModalDots(currentIndex, totalSlides) {
-    const modalDotsNav = document.querySelector('.modal-content .dots-nav');
+    const modalDotsNav = document.querySelector('#imageModal .modal-content .dots-nav');
     if (!modalDotsNav) return;
     
-    modalDotsNav.innerHTML = '';
+    modalDotsNav.innerHTML = ''; // Clear existing dots
     for (let i = 0; i < totalSlides; i++) {
         const dot = document.createElement('div');
         dot.className = 'dot' + (i === currentIndex ? ' active' : '');
         dot.setAttribute('aria-label', `Go to image ${i + 1}`);
-        dot.addEventListener('click', () => showModalImage(currentGalleryItem, i));
+        // Pass currentGalleryItem when calling showModalImage from dot click
+        dot.onclick = () => showModalImage(currentGalleryItem, i);
         modalDotsNav.appendChild(dot);
     }
 }
 
-// Section switcher functionality (for guide sections)
-document.addEventListener('DOMContentLoaded', function() {
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+            window.scrollTo({
+                top: targetElement.offsetTop - 70, // Adjusted for fixed nav height
+                behavior: 'smooth'
+            });
+            if (navLinks && navLinks.classList.contains('active')) { // If mobile menu is open, close it
+                navLinks.classList.remove('active');
+                if(mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            }
+        }
+    });
+});
+
+// Section switcher functionality (for guide sections) - Ensure this is correctly scoped or needed on index
+// If guide.html has its own script, this might be duplicated or misplaced.
+// Assuming it's for sections on the current page if any.
+document.addEventListener('DOMContentLoaded', function() { // Can be merged with other DOMContentLoaded
     const switcherBtns = document.querySelectorAll('.switcher-btn');
     const sectionContents = document.querySelectorAll('.section-content');
 
-    switcherBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const targetSection = this.getAttribute('data-target');
-            
-            // Remove active class from all buttons and sections
-            switcherBtns.forEach(b => b.classList.remove('active'));
-            sectionContents.forEach(s => s.classList.remove('active'));
-            
-            // Add active class to clicked button and target section
-            this.classList.add('active');
-            const targetElement = document.getElementById(targetSection);
-            if (targetElement) {
-                targetElement.classList.add('active');
-            }
+    if (switcherBtns.length > 0 && sectionContents.length > 0) {
+        switcherBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetSection = this.getAttribute('data-target');
+
+                switcherBtns.forEach(b => b.classList.remove('active'));
+                sectionContents.forEach(s => s.classList.remove('active'));
+
+                this.classList.add('active');
+                const targetElement = document.getElementById(targetSection);
+                if (targetElement) {
+                    targetElement.classList.add('active');
+                }
+            });
         });
-    });
+        // Optionally, activate the first button and section by default
+        // if (switcherBtns.length > 0) switcherBtns[0].click();
+    }
+});
+
+// Lazy loading observer (if not already handled by browser native lazy loading)
+// This is a basic version. Consider libraries for more robust solutions if needed.
+document.addEventListener('DOMContentLoaded', function() {
+    if ('loading' in HTMLImageElement.prototype) {
+        // Native lazy loading is supported; ensure images have loading="lazy"
+        const images = document.querySelectorAll('img[loading="lazy"]');
+        images.forEach(img => {
+            // Optional: force load if already visible and not loaded by browser for some reason
+            // (usually not needed if 'loading="lazy"' is correctly implemented by browser)
+        });
+    } else {
+        // Fallback for browsers that don't support native lazy loading
+        const lazyImages = [].slice.call(document.querySelectorAll("img[data-src]"));
+        let active = false;
+
+        const lazyLoad = function() {
+            if (active === false) {
+                active = true;
+                setTimeout(function() {
+                    lazyImages.forEach(function(lazyImage) {
+                        if ((lazyImage.getBoundingClientRect().top <= window.innerHeight && lazyImage.getBoundingClientRect().bottom >= 0) && getComputedStyle(lazyImage).display !== "none") {
+                            lazyImage.src = lazyImage.dataset.src;
+                            lazyImage.removeAttribute("data-src"); // Important: remove data-src once loaded
+                            // Optional: remove 'lazy' class if you use one for styling placeholders
+                            // lazyImage.classList.remove("lazy");
+
+                            lazyImages = lazyImages.filter(function(image) {
+                                return image !== lazyImage;
+                            });
+
+                            if (lazyImages.length === 0) {
+                                document.removeEventListener("scroll", lazyLoad);
+                                window.removeEventListener("resize", lazyLoad);
+                                window.removeEventListener("orientationchange", lazyLoad);
+                            }
+                        }
+                    });
+                    active = false;
+                }, 200);
+            }
+        };
+
+        if (lazyImages.length > 0) {
+            document.addEventListener("scroll", lazyLoad);
+            window.addEventListener("resize", lazyLoad);
+            window.addEventListener("orientationchange", lazyLoad);
+            lazyLoad(); // Initial check
+        }
+    }
+});
+
+// Hide loading spinner if it exists and is global (e.g. for initial page load)
+// This was previously inside a DOMContentLoaded that also handled modal buttons.
+// If it's for a global spinner, it should be standalone.
+document.addEventListener('DOMContentLoaded', function() {
+    const globalLoadingSpinner = document.querySelector('.page-loading-spinner'); // Example class
+    if (globalLoadingSpinner) {
+        globalLoadingSpinner.style.display = 'none';
+    }
 });

@@ -832,6 +832,137 @@ a:focus:not(:focus-visible) {
             margin-right: 15px;
             filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
         }
+
+/* Filter Styles */
+#filters {
+    background-color: #f0f7fa; /* Light blue background */
+    padding: 1.5rem 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+#filters .section-title {
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    color: var(--dark);
+}
+
+#filters .section-title::after {
+    background-color: var(--secondary); /* Match accent color with section */
+}
+
+.filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem; /* Increased gap for better spacing */
+    align-items: flex-end; /* Align items to the bottom for mixed height elements */
+    justify-content: center; /* Center filter groups */
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column; /* Stack label and select vertically */
+    gap: 0.5rem; /* Space between label and select */
+    min-width: 200px; /* Minimum width for filter groups */
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.95rem;
+}
+
+.filter-group select {
+    padding: 0.75rem 1rem; /* Increased padding */
+    border: 1px solid #ccc;
+    border-radius: 6px; /* Softer corners */
+    background-color: white;
+    font-size: 1rem;
+    color: var(--dark);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23023047' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+}
+
+.filter-group select:hover {
+    border-color: var(--secondary);
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(142, 202, 230, 0.4); /* Focus ring */
+}
+
+#reset-filters-btn {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--accent);
+    color: var(--dark);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 0; /* Reset margin from generic .btn if any conflict */
+    align-self: flex-end; /* Align with the bottom of other controls */
+}
+
+#reset-filters-btn:hover {
+    background-color: #e6a400; /* Darker accent */
+    transform: translateY(-1px);
+}
+
+#reset-filters-btn:active {
+    transform: translateY(0);
+}
+
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #777;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+
+@media (max-width: 768px) {
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch; /* Make filter groups take full width */
+    }
+
+    .filter-group {
+        min-width: 0; /* Allow full width */
+        width: 100%;
+    }
+
+    #reset-filters-btn {
+        width: 100%; /* Full width button on smaller screens */
+        margin-top: 1rem; /* Add some space above the button */
+    }
+}
+
+@media (max-width: 480px) {
+    #filters {
+        padding: 1rem;
+    }
+    .filter-group select, #reset-filters-btn {
+        font-size: 0.9rem; /* Slightly smaller font for very small screens */
+        padding: 0.6rem 0.8rem;
+    }
+     #reset-filters-btn {
+        padding: 0.7rem 1rem;
+    }
+}
         
         .prereq-images {
             display: flex;
