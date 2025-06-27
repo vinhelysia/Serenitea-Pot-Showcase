@@ -20,8 +20,13 @@
     </nav>
     <main>
         <section id="filters">
-            <h2 class="section-title">Filter Designs</h2>
-            <div class="filter-controls">
+            <div class="filters-header">
+                <h2 class="section-title">Filter Designs</h2>
+                <button id="toggle-filters-btn" class="btn btn-toggle-filters" aria-expanded="true" aria-controls="filter-controls-container">
+                    Hide Filters <i class="fas fa-chevron-up"></i>
+                </button>
+            </div>
+            <div id="filter-controls-container" class="filter-controls">
                 <div class="filter-group">
                     <label for="filter-design-type">Design Type:</label>
                     <select id="filter-design-type">

@@ -834,6 +834,48 @@ a:focus:not(:focus-visible) {
         }
 
 /* Filter Styles */
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem; /* Replaces title margin-bottom */
+}
+
+#filters .section-title {
+    margin-bottom: 0; /* Title margin now handled by filters-header */
+    font-size: 1.8rem;
+    color: var(--dark);
+}
+
+#toggle-filters-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    background-color: var(--primary); /* Using primary color */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#toggle-filters-btn:hover {
+    background-color: var(--secondary); /* Darker shade for hover */
+    transform: translateY(-1px);
+}
+
+#toggle-filters-btn .fas {
+    transition: transform 0.3s ease-in-out;
+}
+
+#toggle-filters-btn[aria-expanded="false"] .fas {
+    transform: rotate(180deg);
+}
+
+
 #filters {
     background-color: #f0f7fa; /* Light blue background */
     padding: 1.5rem 2rem;
@@ -858,6 +900,21 @@ a:focus:not(:focus-visible) {
     gap: 1.5rem; /* Increased gap for better spacing */
     align-items: flex-end; /* Align items to the bottom for mixed height elements */
     justify-content: center; /* Center filter groups */
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out 0.1s, visibility 0s linear 0.5s;
+    max-height: 1000px; /* Large enough to fit content */
+    opacity: 1;
+    visibility: visible;
+}
+
+.filter-controls.filters-collapsed {
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    margin-top: 0; /* Remove margin when collapsed */
+    padding-top: 0; /* Remove padding when collapsed */
+    padding-bottom: 0; /* Remove padding when collapsed */
+    transition: max-height 0.5s ease-in-out, opacity 0.2s ease-in-out, visibility 0s linear 0.5s, margin-top 0.5s ease-in-out, padding-top 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
 }
 
 .filter-group {
