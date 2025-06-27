@@ -29,6 +29,8 @@ const filterDesignType = document.getElementById('filter-design-type');
 const filterRealm = document.getElementById('filter-realm');
 const filterServer = document.getElementById('filter-server');
 const resetFiltersBtn = document.getElementById('reset-filters-btn');
+const toggleFiltersBtn = document.getElementById('toggle-filters-btn');
+const filterControlsContainer = document.getElementById('filter-controls-container');
 
 // Populate filter options
 function populateFilters() {
@@ -208,7 +210,61 @@ document.addEventListener('DOMContentLoaded', function() {
             applyFiltersAndRegenerate();
         });
     }
+
+    // Filter toggle functionality
+    if (toggleFiltersBtn && filterControlsContainer) {
+        // Set initial state based on aria-expanded attribute
+        const initiallyExpanded = toggleFiltersBtn.getAttribute('aria-expanded') === 'true';
+        if (!initiallyExpanded) {
+            filterControlsContainer.classList.add('filters-collapsed');
+            updateToggleButton(false);
+        } else {
+             updateToggleButton(true); // Ensure button text/icon is correct if initially expanded
+        }
+
+
+        toggleFiltersBtn.addEventListener('click', () => {
+            const isExpanded = filterControlsContainer.classList.toggle('filters-collapsed');
+            // The toggle method returns true if the class is removed (meaning it's now expanded),
+            // and false if the class is added (meaning it's now collapsed).
+            // So, isExpanded from classList.toggle is effectively "isNowVisible"
+            // aria-expanded should be true if visible, false if collapsed.
+            // If filters-collapsed is present, it's collapsed (aria-expanded = false)
+            // If filters-collapsed is NOT present, it's expanded (aria-expanded = true)
+            const currentlyExpanded = !filterControlsContainer.classList.contains('filters-collapsed');
+            toggleFiltersBtn.setAttribute('aria-expanded', String(currentlyExpanded));
+            updateToggleButton(currentlyExpanded);
+        });
+    }
 });
+
+function updateToggleButton(isExpanded) {
+    if (!toggleFiltersBtn) return;
+
+    // Get the text part (span) and icon part
+    let textNode = null;
+    for (let i = 0; i < toggleFiltersBtn.childNodes.length; i++) {
+        if (toggleFiltersBtn.childNodes[i].nodeType === Node.TEXT_NODE && toggleFiltersBtn.childNodes[i].textContent.trim() !== '') {
+            textNode = toggleFiltersBtn.childNodes[i];
+            break;
+        }
+    }
+    const icon = toggleFiltersBtn.querySelector('i.fas');
+
+    if (isExpanded) {
+        if (textNode) textNode.textContent = 'Hide Filters '; // Ensure space for icon
+        if (icon) {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        }
+    } else {
+        if (textNode) textNode.textContent = 'Show Filters '; // Ensure space for icon
+        if (icon) {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+}
 
 // Function to apply design type and location mappings
 function applyMappings() {
