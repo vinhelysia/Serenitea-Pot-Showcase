@@ -901,10 +901,19 @@ a:focus:not(:focus-visible) {
     align-items: flex-end; /* Align items to the bottom for mixed height elements */
     justify-content: center; /* Center filter groups */
     overflow: hidden;
-    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out 0.1s, visibility 0s linear 0.5s;
+    /* Corrected transition for expansion: visibility becomes active immediately.
+       Also ensuring margin/padding transitions are defined for symmetry if they are meant to animate. */
+    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out 0.1s, visibility 0s linear 0s, margin-top 0.5s ease-in-out, padding-top 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
     max-height: 1000px; /* Large enough to fit content */
     opacity: 1;
     visibility: visible;
+    /* If margin-top, padding-top, padding-bottom have specific values when expanded,
+       they should be defined here. For example:
+       margin-top: 1rem;
+       padding-top: 0.5rem;
+       padding-bottom: 0.5rem;
+       If they are meant to be 0 or default, the transition will animate from the collapsed state's 0 to that default.
+    */
 }
 
 .filter-controls.filters-collapsed {
@@ -914,6 +923,7 @@ a:focus:not(:focus-visible) {
     margin-top: 0; /* Remove margin when collapsed */
     padding-top: 0; /* Remove padding when collapsed */
     padding-bottom: 0; /* Remove padding when collapsed */
+    /* Transition for collapsing - this seems fine */
     transition: max-height 0.5s ease-in-out, opacity 0.2s ease-in-out, visibility 0s linear 0.5s, margin-top 0.5s ease-in-out, padding-top 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
 }
 
